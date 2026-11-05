@@ -1,0 +1,33 @@
+{% extends "notes/base.html" %}
+
+{% block content %}
+  <h1>Заметки</h1>
+  <p class="subtitle">Django + PostgreSQL в Docker</p>
+
+  <form method="post" class="note-form">
+    {% csrf_token %}
+    {{ form.title }}
+    {{ form.text }}
+    <button type="submit">Добавить</button>
+  </form>
+
+  {% if form.errors %}
+    <div class="errors">{{ form.title.errors }}{{ form.text.errors }}</div>
+  {% endif %}
+
+  {% for note in notes %}
+    <article class="note">
+      <div class="note-body">
+        <h2>{{ note.title }}</h2>
+        {% if note.text %}<p>{{ note.text|linebreaksbr }}</p>{% endif %}
+        <time>{{ note.created_at|date:"d.m.Y H:i" }}</time>
+      </div>
+      <form method="post" action="{% url 'delete_note' note.pk %}">
+        {% csrf_token %}
+        <button class="delete" type="submit" title="Удалить">&times;</button>
+      </form>
+    </article>
+  {% empty %}
+    <p class="empty">Пока пусто — добавьте первую заметку.</p>
+  {% endfor %}
+{% endblock %}
